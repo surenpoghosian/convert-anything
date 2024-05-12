@@ -8,10 +8,3 @@ test ('converts png correctly', () => {
   // const image = convertImage('/Users/surenpoghosyan/Documents/IMG_5029.heic','jpg')
   // expect(image)
 })
-
-// import { add } from '../dist';
-
-// test('adds two numbers correctly', () => {
-//   const result = add(2, 3);
-//   expect(result).toBe(5);
-// });

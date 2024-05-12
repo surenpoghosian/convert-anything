@@ -21,19 +21,19 @@ export async function convertImage(inputFile: string, outputFormat: string): Pro
       // Decode the input image data based on its format
       const decodedImageData = converter.decode(data);
 
-      // Encode the decoded image data into the desired output format
-      const encodedImageData = converter.encode(decodedImageData);
+      // // Encode the decoded image data into the desired output format
+      // const encodedImageData = converter.encode(decodedImageData);
 
-      // Write the encoded image data to a new file
-      const outputFile = `output.${outputFormat}`;
-      fs.writeFile(outputFile, encodedImageData, (err) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-        console.log(`Image converted successfully to ${outputFormat} format!`);
-        resolve();
-      });
+      // // Write the encoded image data to a new file
+      // const outputFile = `output.${outputFormat}`;
+      // fs.writeFile(outputFile, encodedImageData, (err) => {
+      //   if (err) {
+      //     reject(err);
+      //     return;
+      //   }
+      //   console.log(`Image converted successfully to ${outputFormat} format!`);
+      //   resolve();
+      // });
     });
   });
 }
