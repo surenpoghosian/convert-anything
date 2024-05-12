@@ -12,6 +12,7 @@ class PNGConverter implements ImageConverter {
 
     // Extract width and height from the IHDR chunk
     const { width, height, colorType, bitDepth } = this.extractImageInfo(data);
+
     // Extract and decompress image data from IDAT chunks
     const idatData = this.readIDATChunks(data);
 
@@ -72,15 +73,15 @@ class PNGConverter implements ImageConverter {
     const decompressedData = zlib.inflateSync(data); // Synchronous decompression
 
     // Verify that the decompressed data length matches the expected image size
-    const expectedSize = this.calculateExpectedSize(width, height, colorType, bitDepth);
-    const relativeTolerance = 0.01; // 1% tolerance
+    const expectedSize = this.calculateExpectedSize(width, height, bitDepth, colorType);
 
+    const relativeTolerance = 0.01; // 1% tolerance
     const actualSize = decompressedData.length;
     const absoluteDifference = Math.abs(actualSize - expectedSize);
     const relativeDifference = absoluteDifference / expectedSize;
 
     if (relativeDifference > relativeTolerance) {
-        throw new Error(`Decompressed image data size does not match expected size. \n actual: ${actualSize}, expected: ${expectedSize}`);
+      throw new Error(`Decompressed image data size does not match expected size. \n actual: ${actualSize}, expected: ${expectedSize}`);
     }
 
     return decompressedData;
@@ -116,32 +117,32 @@ class PNGConverter implements ImageConverter {
 
   private calculateExpectedSize(width: number, height: number, bitDepth: number, colorType: number): number {
     let bytesPerPixel: number;
-
-    // Determine bytes per pixel based on color type and bit depth
     switch (colorType) {
-        case ColorType.Grayscale:
-            bytesPerPixel = bitDepth / 8;
+        case ColorType.Grayscale: // Grayscale
+            bytesPerPixel = Math.ceil(bitDepth / 8);
             break;
-        case ColorType.Truecolor:
-            bytesPerPixel = bitDepth / 8 * 3;
+        case ColorType.Truecolor: // RGB
+            bytesPerPixel = Math.ceil((bitDepth / 8) * 3);
             break;
-        case ColorType.IndexedColor:
-            // This depends on the palette size and bit depth; for simplicity, let's assume 8 bits per pixel
-            bytesPerPixel = 1;
+        case ColorType.IndexedColor: // Indexed-color (palette)
+            bytesPerPixel = Math.ceil(bitDepth / 8);
             break;
-        case ColorType.GrayscaleAlpha:
-            bytesPerPixel = bitDepth / 8 * 2;
+        case ColorType.GrayscaleAlpha: // Grayscale with alpha
+            bytesPerPixel = Math.ceil((bitDepth / 8) * 2);
             break;
-        case ColorType.TruecolorAlpha:
-            bytesPerPixel = bitDepth / 8 * 4;
+        case ColorType.TruecolorAlpha: // RGBA
+            bytesPerPixel = Math.ceil((bitDepth / 8) * 4);
             break;
         default:
             throw new Error('Unsupported color type');
     }
 
-    // Calculate the expected size based on image dimensions and bytes per pixel
-    const expectedSize = width * height * bytesPerPixel;
-    return expectedSize;
+    // Account for filter bytes (1 byte per scanline)
+    const filterBytes: number = height;
+
+    // Calculate the expected size
+    const dataSize: number = (width * height * bytesPerPixel) + filterBytes; // Image data + filter bytes
+    return dataSize;
 }
 
 
