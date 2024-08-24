@@ -51,7 +51,7 @@ class PNGConverter implements ImageConverter {
     const colorType = ihdrChunk.data.readUInt8(9);
 
     return { width, height, bitDepth, colorType };
-}
+  }
 
   private readIDATChunks(data: Buffer): Buffer {
     let idatData = Buffer.alloc(0);
